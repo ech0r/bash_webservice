@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <style>
+      body {
+          display: flex;
+          align-items: center;
+          justify-content:center;
+          height: 100vh;
+      }
+      section {
+          display: flex;
+          align-items:center;
+          justfy-content:center;
+      }
+      input[name="name"] {
+          height: 30px;
+          margin-top: 20%;
+          border: 1px solid #999;
+          border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+      <form method="POST" action="/login">
+        <input type="text" name="name" />
+        <input type="submit" value="Login" />
+      </form>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo 'Listening on 3000...'
+socat TCP-LISTEN:3000,fork,reuseaddr EXEC:"bash handle_connection" 

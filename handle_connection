@@ -1,0 +1,45 @@
+#!/bin/bash
+
+headers_finished=false
+declare -a request_body
+
+while read line; do
+    #echo $line
+    trline=$(echo $line | tr -d '[\r\n]')
+    [ -z "$trline" ] && break
+    headline_regex='(.*?)\s(.*?)\sHTTP.*?'
+    [[ "$trline" =~ $headline_regex ]] &&
+      request=$(echo $trline | sed -E "s/$headline_regex/\1 \2/")
+    content_length_regex='Content-Length:\s(.*?)'
+    [[ "$trline" =~ $content_length_regex ]] &&
+      content_length=$(echo $trline | sed -E "s/$content_length_regex/\1/")
+    cookie_regex='Cookie:\s(.*?)\=(.*?).*?'
+    [[ "$trline" =~ $cookie_regex ]] &&
+      read cookie_name cookie_value <<< $(echo $trline | sed -E "s/$cookie_regex/\1 \2/")
+done
+
+## Read body
+if [ ! -z "$content_length" ]; then
+    body_regex='(.*?)=(.*?)'
+    while read -n$content_length -t1 line; do
+        #echo $line
+        trline=`echo $line | tr -d '[\r\n]'`
+        [ -z "$trline" ] && break
+        read input_name input_value <<< $(echo $trline | sed -E "s/$body_regex/\1 \2/")
+    done
+fi
+
+case "$request" in
+    "GET /")
+        response="HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n$(cat login.html)"
+        ;;
+    "POST /login")
+        response="HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n$(cat home.html | sed "s/LOGIN_NAME/$input_value/")"
+        ;;
+    *)
+        response="HTTP/1.1 404 NotFound\r\nContent-Type: text/html\r\n\r\n$(cat 404.html)"
+        ;;
+esac
+
+# Send the response back to the client
+printf "%b" "$response"
