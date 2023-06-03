@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo 'Listening on 3000...'
-socat TCP-LISTEN:3000,fork,reuseaddr EXEC:"bash handle_connection" 
+echo 'Listening on 443...'
+socat OPENSSL-LISTEN:443,cert=/etc/letsencrypt/live/www.johnrcooper.com/fullchain.pem,key=/etc/letsencrypt/live/www.johnrcooper.com/privkey.pem,verify=0,fork,reuseaddr EXEC:"bash handle_connection" 
